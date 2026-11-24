@@ -114,6 +114,17 @@
   loadOriginal("tree2",  "assets/original/vale_tree_2.png",  "#2b2e25");
   loadOriginal("tree3",  "assets/original/vale_tree_3.png",  "#23261e");
   loadOriginal("tree4",  "assets/original/vale_tree_4.png",  "#2b2e25");
+  loadOriginal("bridgeRail", "assets/original/bridge_rail.png", "#2a2119");
+  loadOriginal("bridgePost", "assets/original/bridge_post.png", "#241c14");
+  loadOriginal("waterfall", "assets/original/waterfall.png",   "#8a97a0");
+  loadOriginal("pool",    "assets/original/waterfall_pool.png", "#55606a");
+  loadOriginal("guardian","assets/original/garden_guardian.png", "#2b2e25");
+  loadOriginal("mtn0",    "assets/original/mountain_0.png",   "#3d3f38");
+  loadOriginal("mtn1",    "assets/original/mountain_1.png",   "#353730");
+  loadOriginal("mtn2",    "assets/original/mountain_2.png",   "#3d3f38");
+  loadOriginal("wallStrip", "assets/original/wall_strip.png",  "#332a1f");
+  loadOriginal("floorStrip","assets/original/floor_strip.png", "#2c2620");
+  for (let i = 0; i < 8; i++) loadOriginal("statue" + i, `assets/original/statue_${i}.png`, "#26221b");
   const origSprite = name => {
     const c = originalTint[name];
     return c && c.width ? c : null;
@@ -200,12 +211,18 @@
       foe:{ who:"enemy", hp:60, dmg:8,  think:[1.5,.8], kick:.20, speed:38 } },
     { name:"O VALE", sub:"Um vale rochoso separa você da fortaleza. Cuidado com os chutes!", bg:"vale", type:"fight",
       foe:{ who:"enemy", hp:68, dmg:9,  think:[1.4,.75], kick:.30, speed:40 } },
+    { name:"A PONTE", sub:"A ponte de madeira original range sob seus pés. Não pare no meio!", bg:"bridge", type:"fight",
+      foe:{ who:"enemy", hp:72, dmg:9,  think:[1.35,.7], kick:.28, speed:42 } },
+    { name:"A CACHOEIRA", sub:"A cachoeira original de 1986 despenca das rochas. O guardião não recua.", bg:"waterfall", type:"fight",
+      foe:{ who:"enemy", hp:78, dmg:10, think:[1.3,.7], kick:.28, speed:43 } },
     { name:"O PÁTIO EXTERNO", sub:"O portão de ferro cai de repente. Corra (W ou SHIFT) para passar a tempo!", bg:"courtyard", type:"fight", gate:true,
       foe:{ who:"enemy", hp:75, dmg:10, think:[1.3,.7], kick:.25, speed:42, x:470 } },
     { name:"A MURALHA", sub:"A fortaleza de Akuma ergue-se sobre você. Outro guarda bloqueia a passagem.", bg:"rampart", type:"fight",
       foe:{ who:"enemy", hp:82, dmg:9,  think:[1.25,.65], kick:.26, speed:45 } },
     { name:"A GALERIA", sub:"As colunas originais de 1986 sustentam o salão. O guardião da galeria é ágil.", bg:"gallery", type:"fight",
       foe:{ who:"enemy", hp:88, dmg:10, think:[1.2,.6], kick:.28, speed:47 } },
+    { name:"O CORREDOR DAS ESTÁTUAS", sub:"As estátuas originais do templo observam. O guardião espera entre elas.", bg:"statues", type:"fight",
+      foe:{ who:"enemy", hp:92, dmg:10, think:[1.15,.6], kick:.28, speed:48 } },
     { name:"O PÁTIO INTERNO", sub:"Colunas originais do castelo escondem guardas à espreita.", bg:"hall", type:"fight",
       foe:{ who:"enemy", hp:92, dmg:10, think:[1.15,.6], kick:.28, speed:48 } },
     { name:"O PALÁCIO", sub:"Corredores fechados e guardas mais ágeis.", bg:"door", type:"fight",
@@ -214,6 +231,8 @@
       foe:{ who:"enemy", hp:112, dmg:12, think:[.98,.5], kick:.32, speed:55 } },
     { name:"O SALÃO INTERNO", sub:"Os guardas de elite atacam sem hesitar.", bg:"corridor", type:"fight",
       foe:{ who:"enemy", hp:122, dmg:13, think:[.9,.45], kick:.35, speed:58 } },
+    { name:"O JARDIM SUSPENSO", sub:"O jardim de Akuma: a montanha original e o torii guardam a entrada do trono.", bg:"garden", type:"fight",
+      foe:{ who:"enemy", hp:130, dmg:13, think:[.9,.45], kick:.34, speed:57 } },
     { name:"O FALCÃO", sub:"O pássaro de Akuma ataca do alto. Rebata cada mergulho no momento exato!", bg:"courtyard", type:"falcon" },
     { name:"A SALA DO TRONO", sub:"Akuma espera por você.", bg:"throne", type:"fight",
       foe:{ who:"akuma", hp:155, dmg:14, think:[.85,.45], kick:.35, speed:58 } },
@@ -731,6 +750,106 @@
       rect(0, 64, W, 14, "#332a1f"); rect(0, 64, W, 4, "#4a3d2c");
       ctx.fillStyle = "rgba(14,11,8,.18)"; ctx.fillRect(0, 0, W, 400);
       drawFloor("#3a2b1e", "#5b432c", false);
+    } else if (kind === "bridge") {
+      drawSky(false, true);
+      drawFujiBand(.42);
+      rect(0, 330, W, 70, "#2f2c26");
+      // ponte de madeira: corrimão e postes originais (KS0 0x1c9/0x1d0)
+      const rail = origSprite("bridgeRail");
+      const post = origSprite("bridgePost");
+      ctx.save();
+      ctx.globalAlpha = .95;
+      if (rail) {
+        ctx.imageSmoothingEnabled = false;
+        for (let x = 0; x < W; x += 96) ctx.drawImage(rail, x, 252, 96, 32);
+      } else rect(0, 252, W, 10, "#2a2119");
+      if (post) {
+        for (let x = 20; x < W; x += 84) ctx.drawImage(post, x, 252, 16, 186);
+      } else for (let x = 20; x < W; x += 84) rect(x, 252, 10, 186, "#241c14");
+      ctx.restore();
+      rect(0, 244, W, 10, "#332a1f"); rect(0, 244, W, 3, "#4a3d2c");
+      drawFloor("#3b3329", "#574a3a", true);
+    } else if (kind === "waterfall") {
+      drawSky(false, true);
+      // penhascos
+      rect(0, 210, 240, 228, "#39382f"); rect(0, 200, 240, 14, "#292b25");
+      rect(720, 190, 240, 248, "#33322a"); rect(720, 180, 240, 14, "#292b25");
+      rect(96, 150, 90, 60, "#484237"); rect(80, 142, 120, 10, "#292b25");
+      rect(790, 130, 110, 60, "#484237"); rect(776, 122, 138, 10, "#292b25");
+      // cachoeira original (KS2 0x1d9) com brilho animado
+      const fall = origSprite("waterfall");
+      const pool = origSprite("pool");
+      if (fall) {
+        ctx.save(); ctx.imageSmoothingEnabled = false; ctx.globalAlpha = .9;
+        ctx.drawImage(fall, 340, 48, 280, 430);
+        ctx.globalAlpha = .18 + .1 * Math.sin(game.time * 3);
+        ctx.fillStyle = "#dfe8ee";
+        for (let i = 0; i < 5; i++) ctx.fillRect(368 + i * 46, 60 + ((game.time * 160 + i * 90) % 340), 12, 26);
+        ctx.restore();
+      } else {
+        rect(360, 48, 240, 390, "#8a97a0");
+        ctx.save(); ctx.globalAlpha = .2; ctx.fillStyle = "#dfe8ee";
+        for (let i = 0; i < 5; i++) ctx.fillRect(368 + i * 46, 60 + ((game.time * 160 + i * 90) % 340), 12, 26);
+        ctx.restore();
+      }
+      if (pool) {
+        ctx.save(); ctx.globalAlpha = .85; ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(pool, 290, 400, 380, 58);
+        ctx.restore();
+      } else rect(290, 400, 380, 40, "#55606a");
+      const rock = origSprite("rock0");
+      if (rock) { ctx.save(); ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(rock, 60, 400 - 132, 160, 132);
+        ctx.drawImage(rock, 850, 400 - 110, 140, 116); ctx.restore(); }
+      drawFloor("#34362f", "#4a4d42", true);
+    } else if (kind === "statues") {
+      const g = ctx.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, "#12100c"); g.addColorStop(.55, "#282117"); g.addColorStop(1, "#16120e");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      for (const tx of [118, 480, 842]) {
+        const glow = ctx.createRadialGradient(tx, 210, 8, tx, 210, 210);
+        glow.addColorStop(0, "rgba(214,146,84,.2)"); glow.addColorStop(1, "rgba(214,146,84,0)");
+        ctx.fillStyle = glow; ctx.fillRect(tx - 220, 0, 440, 430);
+      }
+      // faixa de parede e rodapé originais (KSI0 0x160/0x15f)
+      const band = origSprite("wallStrip");
+      if (band) {
+        ctx.save(); ctx.globalAlpha = .8; ctx.imageSmoothingEnabled = false;
+        for (let x = 0; x < W; x += 252) ctx.drawImage(band, x, 96, 252, 60);
+        ctx.restore();
+      }
+      const foot = origSprite("floorStrip");
+      if (foot) {
+        ctx.save(); ctx.globalAlpha = .7; ctx.imageSmoothingEnabled = false;
+        for (let x = 0; x < W; x += 192) ctx.drawImage(foot, x, 388, 192, 28);
+        ctx.restore();
+      }
+      // estátuas originais do templo (KSI0 0x13d–0x144)
+      ctx.save(); ctx.imageSmoothingEnabled = false; ctx.globalAlpha = .92;
+      for (let i = 0; i < 8; i++) {
+        const st = origSprite("statue" + i);
+        if (st) ctx.drawImage(st, 30 + i * 118, 400 - 172, 176, 172);
+      }
+      ctx.restore();
+      rect(0, 64, W, 14, "#332a1f"); rect(0, 64, W, 4, "#4a3d2c");
+      ctx.fillStyle = "rgba(14,11,8,.18)"; ctx.fillRect(0, 0, W, 400);
+      drawFloor("#3a2b1e", "#5b432c", false);
+    } else if (kind === "garden") {
+      const sky = ctx.createLinearGradient(0, 0, 0, H);
+      sky.addColorStop(0, "#2a2438"); sky.addColorStop(.5, "#7a4f52"); sky.addColorStop(.72, "#c08a62"); sky.addColorStop(1, "#2a2119");
+      ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "rgba(230,180,130,.3)"; ctx.beginPath(); ctx.arc(740, 150, 80, 0, Math.PI*2); ctx.fill();
+      // montanhas originais do banco japonês (KSJ2 0x197–0x199)
+      const mtnBack = origSprite("mtn1"), mtnFront = origSprite("mtn0"), mtn2 = origSprite("mtn2");
+      ctx.save(); ctx.imageSmoothingEnabled = false;
+      if (mtnBack) { ctx.globalAlpha = .6; ctx.drawImage(mtnBack, 60, 150, 400, 283); }
+      if (mtn2) { ctx.globalAlpha = .75; ctx.drawImage(mtn2, 420, 190, 432, 260); }
+      if (mtnFront) { ctx.globalAlpha = .95; ctx.drawImage(mtnFront, 620, 230, 368, 260); }
+      ctx.globalAlpha = .9;
+      const guardian = origSprite("guardian");
+      if (guardian) ctx.drawImage(guardian, 20, 400 - 260, 368, 260);
+      ctx.restore();
+      drawFloor("#3b3329", "#574a3a", true);
     } else if (kind === "courtyard") {
       drawSky(true, true);
       rect(0,300,W,100,"#2f2c26"); for (let i = 0; i < 20; i++) rect(i*50+6,284,32,18,"#2f2c26");
