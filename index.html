@@ -69,25 +69,26 @@
             <div class="hud-label"><span>GUERREIRO</span><b id="playerHealthText">100</b></div>
             <div class="bar"><i id="playerHealth"></i></div>
           </div>
-          <div class="hud-center"><span>ETAPA</span><b id="stageNum">1/10</b><small id="stageName">O PENHASCO</small><div class="stage-dots" id="stageDots" aria-hidden="true"></div></div>
+          <div class="hud-center"><span>ETAPA</span><b id="stageNum">1/12</b><small id="stageName">O PENHASCO</small><div class="stage-dots" id="stageDots" aria-hidden="true"></div></div>
           <div class="hud-enemy">
             <div class="hud-label"><span id="enemyLabel">GUARDA</span><b id="enemyHealthText">100</b></div>
             <div class="bar enemy-bar"><i id="enemyHealth"></i></div>
           </div>
         </div>
         <div class="game-controls">
-          <span><kbd>←</kbd><kbd>→</kbd> MOVER</span>
-          <span><kbd>ESPAÇO</kbd> SOCO</span><span><kbd>X</kbd> CHUTE</span><span><kbd>SHIFT</kbd> CORRER</span>
-          <span><kbd>↓</kbd> DEFENDER</span>
+          <span><kbd>A</kbd><kbd>D</kbd> MOVER</span>
+          <span><kbd>W</kbd>/<kbd>SHIFT</kbd> CORRER</span>
+          <span><kbd>S</kbd> AGACHAR</span>
+          <span><kbd>ESPAÇO</kbd> SOCO</span><span><kbd>F</kbd> CHUTE</span>
           <span><kbd>P</kbd>/<kbd>ESC</kbd> PAUSA</span>
-          <span><kbd>M</kbd> SOM</span>
+          <span><kbd>M</kbd> SOM</span><span><kbd>T</kbd> TELA CHEIA</span>
           <span><kbd>ENTER</kbd> COMEÇAR / REINICIAR</span>
         </div>
         <div class="touch-controls" id="touchControls" aria-label="Controles de toque">
           <div class="touch-pad">
             <button class="touch-btn" type="button" data-hold="ArrowLeft" aria-label="Mover para a esquerda">◀</button>
             <button class="touch-btn" type="button" data-hold="ArrowRight" aria-label="Mover para a direita">▶</button>
-            <button class="touch-btn" type="button" data-hold="ArrowDown" aria-label="Defender">DEF</button>
+            <button class="touch-btn" type="button" data-hold="ArrowDown" aria-label="Agachar">AGACHAR</button>
           </div>
           <div class="touch-actions">
             <button class="touch-btn touch-run" type="button" data-hold="ShiftLeft" aria-label="Correr (segure)">CORRER</button>
@@ -104,24 +105,25 @@
         <h2>A JORNADA</h2>
         <p>Como no original de 1984, a aventura é contínua: derrote o inimigo, avance para a direita e siga pela fortaleza. Não há vidas extras: ao cair, você recomeça do penhasco.</p>
         <ul>
-          <li><b>Movimento</b><span>Use ← e → para ajustar a distância. Andando você fica em postura de luta.</span></li>
-          <li><b>Ataque</b><span>Espaço desfere um soco; X aplica um chute mais forte.</span></li>
-          <li><b>Corrida</b><span>Segure Shift e mova-se para correr. Correndo você não ataca, e qualquer golpe recebido é fatal.</span></li>
-          <li><b>Defesa</b><span>Segure ↓ para bloquear os ataques do adversário.</span></li>
+          <li><b>Movimento</b><span>Use A e D para ajustar a distância. Andando você fica em postura de luta.</span></li>
+          <li><b>Ataque</b><span>Espaço desfere um soco; F aplica um chute mais forte.</span></li>
+          <li><b>Corrida</b><span>Segure W (ou Shift) e mova-se para correr. Correndo você não ataca, e qualquer golpe recebido é fatal.</span></li>
+          <li><b>Agachamento</b><span>Segure S para agachar: você desvia dos socos, mas chutes ainda acertam. Agachado não dá para andar nem atacar.</span></li>
           <li><b>Vida</b><span>A energia se recupera aos poucos se você evitar ser atingido por alguns segundos.</span></li>
         </ul>
       </article>
       <article class="info-card design-card">
         <p class="eyebrow">03 / O PERCURSO</p>
-        <h2>10 ETAPAS ATÉ MARIKO</h2>
+        <h2>12 ETAPAS ATÉ MARIKO</h2>
         <ul>
-          <li><b>1-2 · Penhasco e Pátio</b><span>Monte Fuji original ao fundo, os primeiros guardas e o portão de ferro que cai: só passa quem corre.</span></li>
-          <li><b>3 · A Muralha</b><span>A fortaleza original de 1986 domina o horizonte; outro guarda protege a entrada.</span></li>
-          <li><b>4-5 · Pátio Interno e Palácio</b><span>Colunas e portais reconstruídos dos cenários originais do disco.</span></li>
-          <li><b>6-7 · Escadaria e Salão</b><span>A escada original leva ao salão; guardas de elite atacam sem hesitar.</span></li>
-          <li><b>8 · O Falcão</b><span>A ave de Akuma mergulha do alto. Rebata no tempo exato.</span></li>
-          <li><b>9 · Sala do Trono</b><span>O duelo final contra Akuma.</span></li>
-          <li><b>10 · A Prisão</b><span>Mariko espera. Aproxime-se correndo, sem postura de luta.</span></li>
+          <li><b>1-2 · Penhasco e Vale</b><span>Monte Fuji original ao fundo, guardas, árvores e rochas extraídas do disco de 1986.</span></li>
+          <li><b>3 · O Pátio Externo</b><span>O portão de ferro original (KS0) cai de repente: só passa quem corre.</span></li>
+          <li><b>4-5 · Muralha e Galeria</b><span>Colunas originais do disco (KS3) sustentam a galeria; outro guarda protege a entrada.</span></li>
+          <li><b>6-7 · Pátio Interno e Palácio</b><span>Colunas e portais reconstruídos dos cenários originais do disco.</span></li>
+          <li><b>8-9 · Escadaria e Salão</b><span>A escada original leva ao salão; guardas de elite atacam sem hesitar.</span></li>
+          <li><b>10 · O Falcão</b><span>A ave de Akuma, com sprites originais do disco (KSI4), mergulha do alto. Rebata no tempo exato.</span></li>
+          <li><b>11 · Sala do Trono</b><span>O duelo final contra Akuma.</span></li>
+          <li><b>12 · A Prisão</b><span>Grades originais (KS1); Mariko espera. Aproxime-se correndo, sem postura de luta.</span></li>
         </ul>
       </article>
     </section>

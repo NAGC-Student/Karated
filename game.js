@@ -77,6 +77,48 @@
     return !!(img && img.complete && img.naturalWidth);
   };
 
+  /* ---------- sprites cenográficos originais do disco IBM (silhuetas tingidas) ---------- */
+  // PNGs extraídos dos bancos KS*/KSI*/KM* (máscara aplicada, 4x nearest) e tingidos
+  // como silhuetas para combinar com os cenários desenhados do port.
+  const originalTint = {};
+  function loadOriginal(name, file, tint) {
+    const img = new Image();
+    img.addEventListener("load", () => {
+      const c = document.createElement("canvas");
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      const g = c.getContext("2d");
+      g.imageSmoothingEnabled = false;
+      g.drawImage(img, 0, 0);
+      g.globalCompositeOperation = "source-in";
+      g.fillStyle = tint; g.fillRect(0, 0, c.width, c.height);
+      originalTint[name] = c;
+    });
+    img.src = file;
+  }
+  loadOriginal("gate",   "assets/original/gate.png",        "#0f1013");
+  loadOriginal("bars",   "assets/original/prison_bars.png",  "#0b0c0e");
+  loadOriginal("falcon0","assets/original/falcon_0.png",     "#2a1d13");
+  loadOriginal("falcon1","assets/original/falcon_1.png",     "#2a1d13");
+  loadOriginal("falcon2","assets/original/falcon_2.png",     "#332315");
+  loadOriginal("falcon3","assets/original/falcon_3.png",     "#2a1d13");
+  loadOriginal("falcon4","assets/original/falcon_4.png",     "#241a11");
+  loadOriginal("falcon5","assets/original/falcon_5.png",     "#241a11");
+  loadOriginal("col0",   "assets/original/gallery_column_0.png","#241d16");
+  loadOriginal("col1",   "assets/original/gallery_column_1.png","#1e1812");
+  loadOriginal("col2",   "assets/original/gallery_column_2.png","#2a221a");
+  loadOriginal("col3",   "assets/original/gallery_column_3.png","#1e1812");
+  loadOriginal("rock0",  "assets/original/vale_rock_0.png",  "#3a382f");
+  loadOriginal("ledge",  "assets/original/vale_ledge.png",   "#33352c");
+  loadOriginal("tree0",  "assets/original/vale_tree_0.png",  "#2b2e25");
+  loadOriginal("tree1",  "assets/original/vale_tree_1.png",  "#262921");
+  loadOriginal("tree2",  "assets/original/vale_tree_2.png",  "#2b2e25");
+  loadOriginal("tree3",  "assets/original/vale_tree_3.png",  "#23261e");
+  loadOriginal("tree4",  "assets/original/vale_tree_4.png",  "#2b2e25");
+  const origSprite = name => {
+    const c = originalTint[name];
+    return c && c.width ? c : null;
+  };
+
 
   /* ---------- efeitos sonoros procedurais (sem arquivos externos) ---------- */
   let audioCtx = null;
@@ -156,10 +198,14 @@
   const stages = [
     { name:"O PENHASCO", sub:"Os guardas de Akuma vigiam o caminho até a fortaleza.", bg:"cliff", type:"fight",
       foe:{ who:"enemy", hp:60, dmg:8,  think:[1.5,.8], kick:.20, speed:38 } },
-    { name:"O PÁTIO EXTERNO", sub:"O portão de ferro cai de repente. Corra (SHIFT) para passar a tempo!", bg:"courtyard", type:"fight", gate:true,
+    { name:"O VALE", sub:"Um vale rochoso separa você da fortaleza. Cuidado com os chutes!", bg:"vale", type:"fight",
+      foe:{ who:"enemy", hp:68, dmg:9,  think:[1.4,.75], kick:.30, speed:40 } },
+    { name:"O PÁTIO EXTERNO", sub:"O portão de ferro cai de repente. Corra (W ou SHIFT) para passar a tempo!", bg:"courtyard", type:"fight", gate:true,
       foe:{ who:"enemy", hp:75, dmg:10, think:[1.3,.7], kick:.25, speed:42, x:470 } },
     { name:"A MURALHA", sub:"A fortaleza de Akuma ergue-se sobre você. Outro guarda bloqueia a passagem.", bg:"rampart", type:"fight",
       foe:{ who:"enemy", hp:82, dmg:9,  think:[1.25,.65], kick:.26, speed:45 } },
+    { name:"A GALERIA", sub:"As colunas originais de 1986 sustentam o salão. O guardião da galeria é ágil.", bg:"gallery", type:"fight",
+      foe:{ who:"enemy", hp:88, dmg:10, think:[1.2,.6], kick:.28, speed:47 } },
     { name:"O PÁTIO INTERNO", sub:"Colunas originais do castelo escondem guardas à espreita.", bg:"hall", type:"fight",
       foe:{ who:"enemy", hp:92, dmg:10, think:[1.15,.6], kick:.28, speed:48 } },
     { name:"O PALÁCIO", sub:"Corredores fechados e guardas mais ágeis.", bg:"door", type:"fight",
@@ -199,7 +245,7 @@
   function fighter(who, x, cfg) {
     const maxHp = cfg?.hp || 100;
     return { who, player:who==="hero", x, y:floorY, hp:maxHp, maxHp, cfg, action:"idle",
-      actionTime:0, attackCooldown:0, hitFlash:0, block:false, running:false, lock:0,
+      actionTime:0, attackCooldown:0, hitFlash:0, crouch:false, running:false, lock:0,
       sinceHit:99, defeated:false, aiTimer:1.1, attackDone:false, anim:"stance", animTime:0,
       animDur:0, attackType:"punch", bowTimer:0, stun:0 };
   }
@@ -213,7 +259,7 @@
     game.attackBuffer = null; game.lastHitFatal = false; game.hitReason = "";
     game.message = ""; game.messageTimer = 0;
     const p = game.player || fighter("hero", 110);
-    p.x = 110; p.action = "idle"; p.anim = "stance"; p.animTime = 0; p.block = false; p.running = false;
+    p.x = 110; p.action = "idle"; p.anim = "stance"; p.animTime = 0; p.crouch = false; p.running = false;
     p.actionTime = 0; p.attackCooldown = 0; p.bowTimer = 0; p.lock = 0; p.stun = 0; p.attackDone = true;
     if (p.hp <= 0) p.hp = p.maxHp;
     game.player = p;
@@ -324,7 +370,7 @@
     p.action = "attack"; p.attackType = type;
     p.actionTime = type === "kick" ? .43 : .34;
     p.attackCooldown = type === "kick" ? .62 : .43;
-    p.attackDone = false; p.block = false; p.anim = type; p.animTime = 0; p.animDur = p.actionTime;
+    p.attackDone = false; p.crouch = false; p.anim = type; p.animTime = 0; p.animDur = p.actionTime;
     game.attackBuffer = null;
     sfx(type === "kick" ? "kick" : "punch");
   }
@@ -373,7 +419,7 @@
         e.attackDone = true;
         if (Math.abs(e.x - p.x) < 112) {
           if (p.running) { damage(p, p.hp, true); setMessage("ATINGIDO CORRENDO!"); } // morte em um golpe
-          else if (p.block) { setMessage("DEFESA!"); burst(p.x + 30, p.y - 65, "#a6c5b5"); sfx("block"); }
+          else if (p.crouch && e.attackType === "punch") { setMessage("ESQUIVA!"); burst(p.x + 30, p.y - 70, "#a6c5b5"); sfx("block"); }
           else damage(p, c.dmg);
         }
       }
@@ -414,7 +460,7 @@
       if (k >= 1) {
         if (Math.abs(p.x - f.tx) < 75 && p.hp > 0) {
           if (p.running) { damage(p, p.hp, true); setMessage("ATINGIDO CORRENDO!"); }
-          else if (p.block) { setMessage("DEFESA!"); burst(p.x + 30, p.y - 85, "#a6c5b5"); sfx("block"); }
+          else if (p.crouch) { setMessage("ESQUIVA!"); burst(p.x + 30, p.y - 70, "#a6c5b5"); sfx("block"); }
           else damage(p, 14);
         }
         f.state = "retreat"; f.t = 0;
@@ -528,29 +574,30 @@
     }
     if (game.victoryLock > 0) { game.victoryLock = Math.max(0, game.victoryLock - dt); p.lock = game.victoryLock; }
     else if (p.lock > 0) p.lock = Math.max(0, p.lock - dt);
-    const sprint = keys.has("ShiftLeft") || keys.has("ShiftRight");
-    const moving = keys.has("ArrowLeft") || keys.has("ArrowRight");
-    p.block = keys.has("ArrowDown") && p.action !== "attack" && p.lock <= 0 && p.bowTimer <= 0;
-    p.running = sprint && moving && !p.block && p.action !== "attack" && p.bowTimer <= 0 && p.lock <= 0 && p.hp > 0;
+    const sprint = keys.has("ShiftLeft") || keys.has("ShiftRight") || keys.has("KeyW");
+    const moving = keys.has("ArrowLeft") || keys.has("ArrowRight") || keys.has("KeyA") || keys.has("KeyD");
+    // agachar (S ou ↓): esquiva dos socos; não anda nem ataca agachado
+    p.crouch = (keys.has("ArrowDown") || keys.has("KeyS")) && p.action !== "attack" && p.lock <= 0 && p.bowTimer <= 0 && p.hp > 0;
+    p.running = sprint && moving && !p.crouch && p.action !== "attack" && p.bowTimer <= 0 && p.lock <= 0 && p.hp > 0;
     if (p.bowTimer > 0) p.bowTimer = Math.max(0, p.bowTimer - dt);
 
     // pequeno buffer de input: um soco/chute pedido no fim do cooldown ainda entra
     if (game.attackBuffer) {
       game.attackBuffer.t -= dt;
       if (game.attackBuffer.t <= 0) game.attackBuffer = null;
-      else if (p.attackCooldown <= 0 && p.action !== "attack" && p.lock <= 0 && p.bowTimer <= 0 && !p.running && !p.block) {
+      else if (p.attackCooldown <= 0 && p.action !== "attack" && p.lock <= 0 && p.bowTimer <= 0 && !p.running && !p.crouch) {
         const type = game.attackBuffer.type; game.attackBuffer = null; attack(p, type);
       }
     }
 
     const gateWarn = game.gate && game.gate.state === "warn";
     const frozen = p.bowTimer > 0 || p.lock > 0 || gateWarn || (game.mariko && game.mariko.state !== "wait");
-    if (p.hp > 0 && !p.block && p.action !== "attack" && !frozen) {
+    if (p.hp > 0 && !p.crouch && p.action !== "attack" && !frozen) {
       const speed = sprint ? 245 : 170;
-      if (keys.has("ArrowLeft")) { p.x -= speed * dt; p.action = "walk"; }
-      else if (keys.has("ArrowRight")) { p.x += speed * dt; p.action = "walk"; }
+      if (keys.has("ArrowLeft") || keys.has("KeyA")) { p.x -= speed * dt; p.action = "walk"; }
+      else if (keys.has("ArrowRight") || keys.has("KeyD")) { p.x += speed * dt; p.action = "walk"; }
       else p.action = "idle";
-    } else if (p.block) p.action = "block";
+    } else if (p.crouch) p.action = "crouch";
     else if (frozen && p.action !== "attack") p.action = "idle";
     // contra o guarda vivo o jogador não passa por ele
     const maxX = e && !e.defeated ? e.x - 70 : game.mariko ? game.mariko.x - 90 : 915;
@@ -562,7 +609,7 @@
       if (p.anim !== "reverence") { p.anim = "reverence"; p.animTime = 0; }
     } else if (p.lock > 0) {
       if (p.anim !== "victory") { p.anim = "victory"; p.animTime = 0; }
-    } else if (p.action === "walk" || p.action === "idle" || p.action === "block") {
+    } else if (p.action === "walk" || p.action === "idle" || p.action === "crouch") {
       const nextAnim = p.action === "walk" ? (sprint ? "run" : "walk") : "stance";
       if (p.anim !== nextAnim) { p.anim = nextAnim; p.animTime = 0; }
     }
@@ -646,6 +693,44 @@
       drawFujiBand(.58);
       rect(90,282,100,58,"#39382f"); rect(76,274,128,10,"#292b25"); rect(108,248,65,30,"#484237"); rect(96,243,88,8,"#292b25");
       drawFloor("#37382f", "#555044", true);
+    } else if (kind === "vale") {
+      drawSky(false, true);
+      drawFujiBand(.5);
+      // silhuetas originais do vale (KS4): árvores, rochas e a ponte de pedra
+      const back = [ ["tree1", 40], ["tree3", 250], ["tree0", 700], ["tree4", 860] ];
+      for (const [n, x] of back) {
+        const c = origSprite(n);
+        if (c) { ctx.save(); ctx.globalAlpha = .85; ctx.imageSmoothingEnabled = false;
+          ctx.drawImage(c, x, 400 - 152, 144, 152); ctx.restore(); }
+      }
+      const ledge = origSprite("ledge");
+      if (ledge) { ctx.save(); ctx.globalAlpha = .9; ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(ledge, 330, 392, 340, 20); ctx.restore(); }
+      const rock = origSprite("rock0");
+      if (rock) { ctx.save(); ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(rock, 120, 400 - 132, 160, 132);
+        ctx.drawImage(rock, 760, 400 - 110, 140, 116); ctx.restore(); }
+      drawFloor("#37382f", "#555044", true);
+    } else if (kind === "gallery") {
+      const g = ctx.createLinearGradient(0, 0, 0, H);
+      g.addColorStop(0, "#14100b"); g.addColorStop(.55, "#2a2117"); g.addColorStop(1, "#17120d");
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      for (const tx of [118, 480, 842]) {
+        const glow = ctx.createRadialGradient(tx, 210, 8, tx, 210, 210);
+        glow.addColorStop(0, "rgba(214,146,84,.22)"); glow.addColorStop(1, "rgba(214,146,84,0)");
+        ctx.fillStyle = glow; ctx.fillRect(tx - 220, 0, 440, 430);
+      }
+      // colunas originais do disco (KS3 0x1d1–0x1d4)
+      const cols = [ ["col2", 20], ["col0", 250], ["col3", 480], ["col1", 610], ["col2", 800] ];
+      for (const [n, x] of cols) {
+        const c = origSprite(n);
+        if (c) { ctx.save(); ctx.globalAlpha = .95; ctx.imageSmoothingEnabled = false;
+          const w = n === "col1" ? 40 : 96;
+          ctx.drawImage(c, x, 400 - 396, w, 396); ctx.restore(); }
+      }
+      rect(0, 64, W, 14, "#332a1f"); rect(0, 64, W, 4, "#4a3d2c");
+      ctx.fillStyle = "rgba(14,11,8,.18)"; ctx.fillRect(0, 0, W, 400);
+      drawFloor("#3a2b1e", "#5b432c", false);
     } else if (kind === "courtyard") {
       drawSky(true, true);
       rect(0,300,W,100,"#2f2c26"); for (let i = 0; i < 20; i++) rect(i*50+6,284,32,18,"#2f2c26");
@@ -691,7 +776,15 @@
       rect(0,0,W,H,"#26282a");
       for (let y = 0; y < 400; y += 28) for (let x = (y/28%2)*30; x < W; x += 60) { rect(x,y,56,2,"#1b1d1f"); rect(x,y,2,28,"#1b1d1f"); }
       rect(640,70,270,330,"#141516");
-      for (let i = 0; i < 9; i++) rect(652+i*30,70,8,330,"#2e3032");
+      // grades originais do disco (KS1 0x1cb) atrás de Mariko
+      const bars = origSprite("bars");
+      if (bars) {
+        ctx.save(); ctx.imageSmoothingEnabled = false;
+        for (let i = 0; i < 7; i++) ctx.drawImage(bars, 646 + i * 38, 70, 32, 330);
+        ctx.restore();
+      } else {
+        for (let i = 0; i < 9; i++) rect(652+i*30,70,8,330,"#2e3032");
+      }
       rect(640,70,270,10,"#3a3d3f");
       rect(700,110,60,50,"#0b0c0d"); rect(708,118,44,34,"#3a4a63");
       drawFloor("#34363a", "#44474b", false);
@@ -703,9 +796,19 @@
     rect(x-62,top-30,26,floorY-top+30,"#3a362c"); rect(x+36,top-30,26,floorY-top+30,"#3a362c");
     rect(x-70,top-40,140,16,"#242018");
     const frac = g.state === "open" || g.state === "warn" ? 0 : g.state === "falling" ? Math.min(1, g.t / .9) ** 2 : 1;
-    const bottom = top - 24 + (floorY - top + 24) * frac;
-    for (let i = 0; i < 6; i++) rect(x-33+i*13, top-24, 5, bottom - (top-24), "#16171a");
-    if (frac > 0) rect(x-36, bottom-8, 72, 8, "#0f1012");
+    const gateH = floorY - top + 24;
+    const bottom = top - 24 + gateH * frac;
+    const gate = origSprite("gate");
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x - 42, top - 30, 84, floorY - top + 34); ctx.clip();
+    if (gate) {
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(gate, Math.round(x - 36), Math.round(bottom - gateH), 72, gateH);
+    } else {
+      for (let i = 0; i < 6; i++) rect(x-33+i*13, top-24, 5, bottom - (top-24), "#16171a");
+      if (frac > 0) rect(x-36, bottom-8, 72, 8, "#0f1012");
+    }
+    ctx.restore();
     if (g.state === "warn" || g.state === "falling") {
       ctx.save();
       ctx.textAlign = "center"; ctx.font = "bold 17px monospace";
@@ -717,7 +820,6 @@
   function drawFighter(f) {
     const who = f.who;
     let anim = f.anim || "stance";
-    if (f.action === "block") anim = "stance";
     if (f.action === "fall" || f.hp <= 0) anim = "death";
     if (!spriteCounts[who][anim]) anim = "stance";
     const count = spriteCounts[who][anim];
@@ -736,6 +838,7 @@
     ctx.fillStyle = "#17181388";
     ctx.beginPath(); ctx.ellipse(f.x, f.y - 1, 30, 5, 0, 0, Math.PI * 2); ctx.fill();
     ctx.translate(Math.round(f.x), Math.round(f.y));
+    if (f.action === "crouch") ctx.scale(1, .68);            // agachado: postura baixa
     if (f.hitFlash > 0) ctx.globalAlpha = .55 + .45 * Math.sin(f.hitFlash * 55);
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(img, -dw/2, -dh, dw, dh);
@@ -759,7 +862,26 @@
       ctx.font = "bold 22px monospace"; ctx.textAlign = "center"; ctx.fillStyle = "#e6c27c";
       ctx.fillText("!", f.tx, floorY - 14); ctx.textAlign = "left";
     }
-    const s = 4, up = Math.sin(f.flap) > 0;
+    // sprites originais do falcão (KSI4 0x17b–0x180): 0/1 pousado, 2 bater de asas,
+    // 3 planando, 4 recuando, 5 mergulhando
+    let name = "falcon3";
+    if (f.state === "dive") name = "falcon5";
+    else if (f.state === "retreat") name = "falcon4";
+    else if (f.state === "hover" || f.state === "enter") name = Math.sin(f.flap) > 0 ? "falcon2" : "falcon3";
+    const spr = origSprite(name);
+    if (spr) {
+      const h = name === "falcon2" ? 88 : 96;
+      const w = Math.round(spr.width * (h / spr.height));
+      const faceLeft = f.state === "dive" ? f.tx < f.sx : (game.player ? game.player.x < f.x : true);
+      ctx.save(); ctx.translate(Math.round(f.x), Math.round(f.y));
+      if (f.flash > 0) ctx.globalAlpha = .5 + .5 * Math.sin(f.flash * 80);
+      if (faceLeft) ctx.scale(-1, 1);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(spr, -Math.round(w / 2), -Math.round(h / 2), w, h);
+      ctx.restore();
+      return;
+    }
+    const s = 4, up = Math.sin(f.flap) > 0;  // fallback procedural
     ctx.save(); ctx.translate(Math.round(f.x), Math.round(f.y));
     if (f.flash > 0) ctx.globalAlpha = .5 + .5 * Math.sin(f.flash * 80);
     const px = (cx, cy, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(cx * s, cy * s, w * s, h * s); };
@@ -926,7 +1048,7 @@
   }
   window.addEventListener("keydown", e => {
     if (e.code === "KeyM" && !e.repeat) { toggleMute(); return; }
-    if (e.code === "KeyF" && !e.repeat) { e.preventDefault(); toggleFullscreen(); return; }
+    if (e.code === "KeyT" && !e.repeat) { e.preventDefault(); toggleFullscreen(); return; }
     if (e.code === "KeyP" && !e.repeat) { e.preventDefault(); togglePause(); return; }
     if (e.code === "Escape" && !e.repeat) {
       if (!document.fullscreenElement) { e.preventDefault(); togglePause(); }
@@ -936,10 +1058,10 @@
       if (["menu","gameover","victory"].includes(game.state)) { e.preventDefault(); startGame(); return; }
       if (game.state === "paused") { e.preventDefault(); togglePause(); return; }
     }
-    if (["ArrowLeft","ArrowRight","ArrowDown","ArrowUp","Space"].includes(e.code) && isGameActive()) e.preventDefault();
+    if (["ArrowLeft","ArrowRight","ArrowDown","ArrowUp","Space","KeyW","KeyA","KeyS","KeyD","KeyF"].includes(e.code) && isGameActive()) e.preventDefault();
     keys.add(e.code);
     if (e.code === "Space" && !e.repeat) requestAttack("punch");
-    if (e.code === "KeyX" && !e.repeat) requestAttack("kick");
+    if (e.code === "KeyF" && !e.repeat) requestAttack("kick");
   });
   window.addEventListener("keyup", e => keys.delete(e.code));
   window.addEventListener("blur", () => keys.clear());

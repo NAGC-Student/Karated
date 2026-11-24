@@ -205,9 +205,39 @@ assert(game.state === "paused", "P pauses");
 keydown("KeyP"); frames(2);
 assert(game.state === "playing", "P resumes");
 
+/* 4b. crouch (S/ArrowDown): dodges punches, kicks still land */
+loadStage(0); frames(200);
+{
+  const foe = game.foe;
+  foe.x = game.player.x + 90; foe.aiTimer = 0;
+  foe.cfg = { ...foe.cfg, kick: 0 };  // soco apenas
+  keys.add("ArrowDown");
+  frames(60 * 6);
+  const hpAfterCrouch = game.player.hp;
+  assert(hpAfterCrouch >= game.player.maxHp - 1,
+    `agachado desvia dos socos (hp=${hpAfterCrouch.toFixed(0)}/${game.player.maxHp})`);
+  foe.cfg.kick = 1; foe.aiTimer = 0; foe.action = "idle"; foe.actionTime = 0;
+  frames(60 * 6);
+  keys.clear();
+  assert(game.player.hp < hpAfterCrouch || game.state !== "playing",
+    `chute acerta o jogador agachado (hp ${hpAfterCrouch.toFixed(0)} -> ${game.player.hp.toFixed(0)})`);
+}
+
+/* 4c. W corre; atacar correndo é recusado */
+loadStage(0); frames(200);
+{
+  const x0 = game.player.x;
+  keydown("KeyW"); keydown("KeyD");
+  frames(30);
+  assert(game.player.x > x0 + 60, `W+D move correndo (${x0.toFixed(0)} -> ${game.player.x.toFixed(0)})`);
+  requestAttack("punch"); frames(2);
+  assert(game.player.action !== "attack", "não ataca correndo");
+  keyup("KeyD"); keyup("KeyW");
+}
+
 /* 5. stage 2: beat the guard, then running (Shift) clears the falling gate */
-loadStage(1); frames(200);
-assert(game.state === "playing" && game.stage === 1, "stage 2 (gate) loads");
+loadStage(2); frames(200);
+assert(game.state === "playing" && game.stage === 2, "stage 3 (gate) loads");
 function fightCurrentFoe(maxFrames = 60 * 60) {
   let n = 0;
   keys.add("ArrowDown"); // hold block; attacks still land through it
@@ -236,7 +266,7 @@ assert(game.stage > 1 || game.state === "dying" || game.state === "gameover",
   `running clears the gate and advances (stage=${game.stage}, gate=${game.gate?.state}, state=${game.state})`);
 
 /* 6. falcon stage loads and resolves */
-loadStage(7); frames(200);
+loadStage(9); frames(200);
 assert(game.state === "playing" && game.falcon, "falcon stage loads");
 keydown("ArrowRight"); frames(30); keyup("ArrowRight");
 for (let i = 0; i < 1200 && !game.cleared; i++) {
@@ -248,7 +278,8 @@ assert(game.cleared || game.falcon?.hp < 3, `falcon can be repelled (hp=${game.f
 frames(30);
 
 /* 7. mariko stage: running rescue wins, fighting stance knocks you out */
-loadStage(9); frames(200);
+loadStage(11); frames(200);
+keys.clear();
 assert(game.state === "playing" && game.mariko, "mariko stage loads");
 keydown("ShiftLeft"); keydown("ArrowRight");
 frames(60 * 8);
@@ -267,11 +298,12 @@ while (!["victory", "gameover"].includes(game.state) && guard < 60 * 60 * 30) {
       // walk/run right to the next area (gate stages require the sprint)
       keys.delete("ArrowDown");
       keys.add("ArrowRight"); keys.add("ShiftLeft");
-    } else if (game.stage === 7) {
+    } else if (game.stage === 9) {
       const f = game.falcon;
       keys.add("ArrowDown");
       if (f?.state === "dive") requestAttack("punch");
-    } else if (game.stage === 9) {
+    } else if (game.stage === 11) {
+      keys.delete("ArrowDown");
       keys.add("ShiftLeft"); keys.add("ArrowRight");
     } else if (game.foe) {
       const p = game.player, e = game.foe;
