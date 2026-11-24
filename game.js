@@ -124,6 +124,13 @@
   loadOriginal("mtn2",    "assets/original/mountain_2.png",   "#3d3f38");
   loadOriginal("wallStrip", "assets/original/wall_strip.png",  "#332a1f");
   loadOriginal("floorStrip","assets/original/floor_strip.png", "#2c2620");
+  loadOriginal("gatehouse", "assets/original/gatehouse.png",   "#3a362c");
+  loadOriginal("lattice",  "assets/original/lattice.png",     "#241c14");
+  loadOriginal("shrineGate","assets/original/shrine_gate.png", "#2a2119");
+  loadOriginal("templeArch","assets/original/temple_arch.png", "#332a1f");
+  loadOriginal("templeArch2","assets/original/temple_arch_2.png","#2c2319");
+  loadOriginal("wallSide", "assets/original/wall_side.png",   "#2f2c26");
+  loadOriginal("wallCorner","assets/original/wall_corner.png","#33302a");
   for (let i = 0; i < 8; i++) loadOriginal("statue" + i, `assets/original/statue_${i}.png`, "#26221b");
   const origSprite = name => {
     const c = originalTint[name];
@@ -233,6 +240,12 @@
       foe:{ who:"enemy", hp:122, dmg:13, think:[.9,.45], kick:.35, speed:58 } },
     { name:"O JARDIM SUSPENSO", sub:"O jardim de Akuma: a montanha original e o torii guardam a entrada do trono.", bg:"garden", type:"fight",
       foe:{ who:"enemy", hp:130, dmg:13, think:[.9,.45], kick:.34, speed:57 } },
+    { name:"O PORTÃO DO TEMPLO", sub:"O portão do templo (KS1) se fecha atrás de você. Derrote o guardião!", bg:"gatehouse", type:"fight",
+      foe:{ who:"enemy", hp:135, dmg:13, think:[.9,.45], kick:.34, speed:58 } },
+    { name:"A GALERIA DAS LUZES", sub:"Lanternas fracas, portas gradeadas (KS1) e guardas de elite.", bg:"lanterns", type:"fight",
+      foe:{ who:"enemy", hp:140, dmg:14, think:[.88,.42], kick:.35, speed:58 } },
+    { name:"O SANTUÁRIO", sub:"O portão do santuário (KS3) guarda o último caminho até Akuma.", bg:"shrine", type:"fight",
+      foe:{ who:"enemy", hp:145, dmg:14, think:[.86,.42], kick:.35, speed:59 } },
     { name:"O FALCÃO", sub:"O pássaro de Akuma ataca do alto. Rebata cada mergulho no momento exato!", bg:"courtyard", type:"falcon" },
     { name:"A SALA DO TRONO", sub:"Akuma espera por você.", bg:"throne", type:"fight",
       foe:{ who:"akuma", hp:155, dmg:14, think:[.85,.45], kick:.35, speed:58 } },
@@ -850,6 +863,59 @@
       if (guardian) ctx.drawImage(guardian, 20, 400 - 260, 368, 260);
       ctx.restore();
       drawFloor("#3b3329", "#574a3a", true);
+    } else if (kind === "gatehouse") {
+      drawSky(true, true);
+      rect(0, 310, W, 90, "#2f2c26");
+      // casa do portao original (KS1 0x1cc) com batente
+      const gh = origSprite("gatehouse");
+      ctx.save(); ctx.globalAlpha = .95; ctx.imageSmoothingEnabled = false;
+      if (gh) {
+        ctx.drawImage(gh, 330, 178, 300, 213);
+      } else { rect(330, 200, 300, 200, "#3a362c"); rect(360, 240, 240, 160, "#141516"); }
+      ctx.restore();
+      const lat = origSprite("lattice");
+      if (lat) { ctx.save(); ctx.imageSmoothingEnabled = false; ctx.globalAlpha = .9;
+        ctx.drawImage(lat, 60, 246, 128, 154); ctx.drawImage(lat, 772, 246, 128, 154); ctx.restore(); }
+      ctx.fillStyle = "rgba(224,154,106,.1)"; ctx.beginPath(); ctx.arc(480, 120, 90, 0, Math.PI*2); ctx.fill();
+      drawFloor("#3b3329", "#574a3a", true);
+    } else if (kind === "lanterns") {
+      rect(0, 0, W, H, "#1c1712");
+      rect(0, 0, W, 70, "#0f0c08");
+      // portas gradeadas originais (KS1 0x1cd) ao fundo
+      const lat = origSprite("lattice");
+      ctx.save(); ctx.globalAlpha = .85; ctx.imageSmoothingEnabled = false;
+      if (lat) for (let x = 40; x < W; x += 220) ctx.drawImage(lat, x, 110, 110, 290);
+      ctx.restore();
+      // lanternas suspensas
+      for (let i = 0; i < 6; i++) {
+        const x = 90 + i * 160;
+        const glow = ctx.createRadialGradient(x, 150, 4, x, 150, 90);
+        glow.addColorStop(0, "rgba(230,160,90,.32)"); glow.addColorStop(1, "rgba(230,160,90,0)");
+        ctx.fillStyle = glow; ctx.fillRect(x - 95, 55, 190, 190);
+        rect(x - 3, 60, 6, 40, "#1a1510");
+        rect(x - 14, 100, 28, 40, "#c9563d"); rect(x - 10, 104, 20, 8, "#e8a05a");
+        rect(x - 14, 132, 28, 5, "#7a2b1f");
+      }
+      drawFloor("#2a2118", "#3d3222", false);
+    } else if (kind === "shrine") {
+      drawSky(true);
+      // santuario: montanhas ao fundo e o portao original (KS3 0x1d7)
+      const mtn = origSprite("mtn2");
+      ctx.save(); ctx.globalAlpha = .5; ctx.imageSmoothingEnabled = false;
+      if (mtn) ctx.drawImage(mtn, 120, 190, 700, 445);
+      ctx.restore();
+      const sg = origSprite("shrineGate");
+      ctx.save(); ctx.globalAlpha = .95; ctx.imageSmoothingEnabled = false;
+      if (sg) {
+        ctx.drawImage(sg, 70, 120, 150, 260);
+        ctx.drawImage(sg, 740, 120, 150, 260);
+      }
+      const arch = origSprite("templeArch");
+      if (arch) ctx.drawImage(arch, 400, 108, 160, 283);
+      const arch2 = origSprite("templeArch2");
+      if (arch2) ctx.drawImage(arch2, 280, 60, 400, 205);
+      ctx.restore();
+      drawFloor("#3a2b1e", "#5b432c", false);
     } else if (kind === "courtyard") {
       drawSky(true, true);
       rect(0,300,W,100,"#2f2c26"); for (let i = 0; i < 20; i++) rect(i*50+6,284,32,18,"#2f2c26");

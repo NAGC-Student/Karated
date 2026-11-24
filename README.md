@@ -26,11 +26,11 @@ Em celulares e tablets aparecem controles de toque abaixo do canvas: setas para 
 - **Sprites cenográficos originais do disco** (recortados com máscara dos bancos KS*/KSI*): o portão de ferro (KS0), as grades da prisão (KS1), as colunas da galeria (KS3), o vale com árvores e rochas (KS4) e o falcão animado (KSI4).
 - Efeitos sonoros procedurais em WebAudio (soco, chute, bloqueio, dano, portão, falcão, vitória) com botão de mudo.
 - Pausa, tela cheia, recorde salvo no navegador e pontuação em tempo real.
-- Indicador das 16 etapas, aviso justo antes do portão de ferro e animação de queda antes do game over.
+- Indicador das 19 etapas, aviso justo antes do portão de ferro e animação de queda antes do game over.
 - Controles de toque responsivos, foco visível e respeito a `prefers-reduced-motion`.
 
 ## O que o port reproduz
-Jornada contínua em 16 etapas, um inimigo por vez:
+Jornada contínua em 19 etapas, um inimigo por vez:
 1. **O Penhasco** – primeiro guarda.
 2. **O Vale** – árvores, rochas e ponte de pedra originais (KS4); cuidado com os chutes.
 3. **A Ponte** – corrimão e postes originais (KS0 0x1c9/0x1d0, script BAL01).
@@ -42,9 +42,12 @@ Jornada contínua em 16 etapas, um inimigo por vez:
 9. **O Pátio Interno** e 10. **O Palácio** – guardas mais ágeis e agressivos.
 11. **A Escadaria** e 12. **O Salão Interno** – guardas de elite.
 13. **O Jardim Suspenso** – montanhas e torii originais do banco japonês (KSJ2 0x197–0x199).
-14. **O Falcão** – a ave de Akuma (sprites originais KSI4) mergulha do alto; rebata no momento do mergulho (3 rebatidas).
-15. **A Sala do Trono** – duelo contra Akuma.
-16. **A Prisão** – grades originais (KS1); Mariko. Chegue correndo (W ou Shift, sem postura de luta) para resgatá-la; chegar em postura de luta faz ela nocautear você.
+14. **O Portão do Templo** – casa do portão (KS1 0x1cc) e portas gradeadas (KS1 0x1cd).
+15. **A Galeria das Luzes** – lanternas e portas gradeadas originais (KS1).
+16. **O Santuário** – portão do santuário (KS3 0x1d7) e arcos do templo (KSI0 0x1d5/0x1d6).
+17. **O Falcão** – a ave de Akuma (sprites originais KSI4) mergulha do alto; rebata no momento do mergulho (3 rebatidas).
+18. **A Sala do Trono** – duelo contra Akuma.
+19. **A Prisão** – grades originais (KS1); Mariko. Chegue correndo (W ou Shift, sem postura de luta) para resgatá-la; chegar em postura de luta faz ela nocautear você.
 
 Regras do original:
 - **Postura de luta x corrida:** correndo não se ataca, e qualquer golpe recebido correndo é fatal.

@@ -266,7 +266,7 @@ assert(game.stage > 1 || game.state === "dying" || game.state === "gameover",
   `running clears the gate and advances (stage=${game.stage}, gate=${game.gate?.state}, state=${game.state})`);
 
 /* 6. falcon stage loads and resolves */
-loadStage(13); frames(200);
+loadStage(16); frames(200);
 assert(game.state === "playing" && game.falcon, "falcon stage loads");
 keydown("ArrowRight"); frames(30); keyup("ArrowRight");
 for (let i = 0; i < 1200 && !game.cleared; i++) {
@@ -278,7 +278,7 @@ assert(game.cleared || game.falcon?.hp < 3, `falcon can be repelled (hp=${game.f
 frames(30);
 
 /* 7. mariko stage: running rescue wins, fighting stance knocks you out */
-loadStage(15); frames(200);
+loadStage(18); frames(200);
 keys.clear();
 assert(game.state === "playing" && game.mariko, "mariko stage loads");
 keydown("ShiftLeft"); keydown("ArrowRight");
@@ -298,11 +298,11 @@ while (!["victory", "gameover"].includes(game.state) && guard < 60 * 60 * 30) {
       // walk/run right to the next area (gate stages require the sprint)
       keys.delete("ArrowDown");
       keys.add("ArrowRight"); keys.add("ShiftLeft");
-    } else if (game.stage === 13) {
+    } else if (game.stage === 16) {
       const f = game.falcon;
       keys.add("ArrowDown");
       if (f?.state === "dive") requestAttack("punch");
-    } else if (game.stage === 15) {
+    } else if (game.stage === 18) {
       keys.delete("ArrowDown");
       keys.add("ShiftLeft"); keys.add("ArrowRight");
     } else if (game.foe) {
