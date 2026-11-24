@@ -39,26 +39,26 @@
   // uma silhueta sépia discreta no horizonte, sem pesar no loop.
   const castleImage = new Image();
   const castleLayer = document.createElement("canvas");
-  castleLayer.width = 320; castleLayer.height = 192;
+  castleLayer.width = 320; castleLayer.height = 191;
   let castleReady = false;
   castleImage.addEventListener("load", () => {
     const c = castleLayer.getContext("2d");
     c.imageSmoothingEnabled = false;
-    c.drawImage(castleImage, 0, 0, 320, 192);
+    c.drawImage(castleImage, 0, 0, 320, 191);
     try {
       c.globalCompositeOperation = "saturation";
-      c.fillStyle = "#808080"; c.fillRect(0, 0, 320, 192);
+      c.fillStyle = "#808080"; c.fillRect(0, 0, 320, 191);
       c.globalCompositeOperation = "source-atop";
-      c.fillStyle = "rgba(196,161,101,.5)"; c.fillRect(0, 0, 320, 192);
+      c.fillStyle = "rgba(196,161,101,.5)"; c.fillRect(0, 0, 320, 191);
       c.globalCompositeOperation = "source-over";
-      c.fillStyle = "rgba(12,11,9,.35)"; c.fillRect(0, 0, 320, 192);
+      c.fillStyle = "rgba(12,11,9,.35)"; c.fillRect(0, 0, 320, 191);
     } catch (_) { /* se o blend não existir, a arte original continua válida */ }
     castleReady = true;
   });
   castleImage.src = "assets/original/CASTLE.png";
 
   /* ---------- cenários originais reconstruídos dos scripts do disco ---------- */
-  // FUJI.BCG (64×192) e composições de cenário dos bancos KSI/KS (CAL00/03/04/07).
+  // FUJI.BCG (37 linhas) e composições de cenário dos bancos KSI/KS (CAL00/03/04/07).
   // São desenhados como camadas de fundo; os personagens continuam sendo os sprites do port.
   const originalScene = {};
   for (const [key, file] of Object.entries({
@@ -131,6 +131,9 @@
   loadOriginal("templeArch2","assets/original/temple_arch_2.png","#2c2319");
   loadOriginal("wallSide", "assets/original/wall_side.png",   "#2f2c26");
   loadOriginal("wallCorner","assets/original/wall_corner.png","#33302a");
+  // logotipo original "KARATEKA" (TITLE.BCG decodificado com cabecalho u16, 320x51)
+  const titleLogo = new Image();
+  titleLogo.src = "assets/original/TITLE.png";
   for (let i = 0; i < 8; i++) loadOriginal("statue" + i, `assets/original/statue_${i}.png`, "#26221b");
   const origSprite = name => {
     const c = originalTint[name];
@@ -670,7 +673,7 @@
     ctx.save();
     ctx.globalAlpha = alpha;
     ctx.imageSmoothingEnabled = false;
-    ctx.drawImage(castleLayer, Math.round(x), Math.round(y), Math.round(320 * scale), Math.round(192 * scale));
+    ctx.drawImage(castleLayer, Math.round(x), Math.round(y), Math.round(320 * scale), Math.round(191 * scale));
     ctx.restore();
   }
   function drawSky(dusk, withCastle = false) {
@@ -1086,6 +1089,19 @@
   }
   function drawCards() {
     const st = stages[game.stage];
+    if (game.state === "menu") {
+      // logotipo original de 1986 (TITLE.BCG) sobre o ceu do penhasco
+      if (titleLogo.complete && titleLogo.naturalWidth) {
+        const lw = 560, lh = Math.round(560 * 51 / 320);
+        ctx.save();
+        ctx.imageSmoothingEnabled = false;
+        ctx.globalAlpha = .9;
+        // leve brilho pulsante
+        ctx.shadowColor = "rgba(230,194,124,.35)"; ctx.shadowBlur = 18 + Math.sin(game.time * 2) * 6;
+        ctx.drawImage(titleLogo, Math.round(W/2 - lw/2), 48, lw, lh);
+        ctx.restore();
+      }
+    }
     if (game.state === "intro") {
       ctx.fillStyle = `rgba(10,9,7,${game.timer > .5 ? .82 : game.timer / .5 * .82})`;
       ctx.fillRect(0, 0, W, H);
@@ -1119,7 +1135,7 @@
   function draw() {
     ctx.save();
     if (game.shake > 0) ctx.translate((Math.random() - .5) * game.shake, (Math.random() - .5) * game.shake);
-    drawBackground(stages[game.stage].bg);
+    drawBackground(game.state === "menu" ? "cliff" : stages[game.stage].bg);
     if (game.player) {
       ctx.fillStyle = "#e0c99d"; ctx.font = "10px monospace"; ctx.fillText("道", 28, 35);
       drawGate(game.gate);

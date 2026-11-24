@@ -11,6 +11,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offse
 /* Arte original extraída de CASTLE.BCG (IBM, 1986). */
 .intro-art{background:#0b0a08}
 .castle-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 46%;image-rendering:pixelated;filter:sepia(.55) saturate(1.25) contrast(1.05) brightness(.82);opacity:.92}
+.title-art{position:absolute;z-index:4;top:16px;left:50%;transform:translateX(-50%);width:64%;max-width:320px;height:auto;image-rendering:pixelated;filter:brightness(.55) sepia(.5) saturate(1.3);opacity:.85}
 .art-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(17,16,13,.05) 0%,rgba(17,16,13,.08) 42%,rgba(17,16,13,.55) 76%,rgba(17,16,13,.96) 100%),radial-gradient(ellipse at 50% 42%,transparent 35%,rgba(10,9,7,.55) 100%)}
 .intro-art .art-floor{background:linear-gradient(180deg,transparent 0%,rgba(17,16,13,.75) 45%,#11100d 100%);height:120px;z-index:1}
 .intro-art .art-fighter{left:15%;bottom:54px;transform:scale(.86);transform-origin:bottom center;z-index:2}
