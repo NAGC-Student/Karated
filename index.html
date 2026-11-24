@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#11100d">
+  <meta name="description" content="Karateka Reborn: uma recriação escolar em Canvas inspirada no clássico Karateka (1984), com arte original extraída do disco IBM de 1986.">
+  <title>Karateka Reborn</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="site-shell">
+    <header class="site-header">
+      <a class="brand" href="#" aria-label="Karateka Reborn início">
+        <span class="brand-mark">拳</span>
+        <span><b>KARATEKA</b><small>REBORN · 1984 REIMAGINED</small></span>
+      </a>
+      <span class="header-tag">A FAN-MADE CLASSIC</span>
+    </header>
+
+    <section class="intro">
+      <div class="intro-copy">
+        <p class="eyebrow">A LENDA RECOMEÇA</p>
+        <h1>DISCIPLINA.<br><em>PRECISÃO.</em><br>HONRA.</h1>
+        <p class="lead">Atravesse o caminho do guerreiro. Estude o ritmo de cada adversário, atravesse a fortaleza de Akuma e resgate a Princesa Mariko.</p>
+        <a class="jump-link" href="#game-section">ENTRAR NO COMBATE <span>↓</span></a>
+      </div>
+      <div class="intro-art" aria-hidden="true">
+        <img class="castle-art" src="assets/original/CASTLE.png" alt="" width="320" height="192">
+        <div class="art-shade"></div>
+        <div class="art-floor"></div>
+        <div class="art-fighter"><i></i><b></b><span></span></div>
+        <div class="vertical-stamp">空手家 · WAY OF THE WARRIOR</div>
+        <span class="art-source">ARTE ORIGINAL · IBM 1986</span>
+      </div>
+    </section>
+
+    <section class="game-section" id="game-section">
+      <div class="section-heading">
+        <div><p class="eyebrow">01 / O DESAFIO</p><h2>CAMINHO DO GUERREIRO</h2></div>
+        <p class="section-note">Um adversário por vez. Cada golpe conta.</p>
+      </div>
+      <div class="game-shell">
+        <div class="game-topline">
+          <span id="stageTitle">ETAPA 01 — O PENHASCO</span>
+          <span class="score-line" id="scoreLine">PONTOS 000000 · RECORDE 000000</span>
+          <div class="game-tools">
+            <span id="gameStatus" aria-live="polite">AGUARDANDO LUTADOR</span>
+            <button id="pauseBtn" class="tool-btn" type="button" aria-label="Pausar jogo" title="Pausar (P)">II</button>
+            <button id="soundBtn" class="tool-btn" type="button" aria-label="Desligar som" title="Som (M)" aria-pressed="false">SOM</button>
+            <button id="fullscreenBtn" class="tool-btn" type="button" aria-label="Tela cheia" title="Tela cheia (F)">⛶</button>
+          </div>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="game" width="960" height="540" aria-label="Jogo Karateka Reborn"></canvas>
+          <div class="screen-overlay" id="overlay">
+            <p class="overlay-kicker">KARATEKA REBORN</p>
+            <h3 id="overlayTitle">O CAMINHO<br>COMEÇA AGORA</h3>
+            <p id="overlayText">Atravesse a fortaleza de Akuma, derrote os guardas e resgate a Princesa Mariko.</p>
+            <p class="overlay-record" id="overlayRecord"></p>
+            <button id="startBtn" class="primary-btn">INICIAR JOGO</button>
+          </div>
+        </div>
+        <div class="game-hud">
+          <div class="hud-player">
+            <div class="hud-label"><span>GUERREIRO</span><b id="playerHealthText">100</b></div>
+            <div class="bar"><i id="playerHealth"></i></div>
+          </div>
+          <div class="hud-center"><span>ETAPA</span><b id="stageNum">1/10</b><small id="stageName">O PENHASCO</small><div class="stage-dots" id="stageDots" aria-hidden="true"></div></div>
+          <div class="hud-enemy">
+            <div class="hud-label"><span id="enemyLabel">GUARDA</span><b id="enemyHealthText">100</b></div>
+            <div class="bar enemy-bar"><i id="enemyHealth"></i></div>
+          </div>
+        </div>
+        <div class="game-controls">
+          <span><kbd>←</kbd><kbd>→</kbd> MOVER</span>
+          <span><kbd>ESPAÇO</kbd> SOCO</span><span><kbd>X</kbd> CHUTE</span><span><kbd>SHIFT</kbd> CORRER</span>
+          <span><kbd>↓</kbd> DEFENDER</span>
+          <span><kbd>P</kbd>/<kbd>ESC</kbd> PAUSA</span>
+          <span><kbd>M</kbd> SOM</span>
+          <span><kbd>ENTER</kbd> COMEÇAR / REINICIAR</span>
+        </div>
+        <div class="touch-controls" id="touchControls" aria-label="Controles de toque">
+          <div class="touch-pad">
+            <button class="touch-btn" type="button" data-hold="ArrowLeft" aria-label="Mover para a esquerda">◀</button>
+            <button class="touch-btn" type="button" data-hold="ArrowRight" aria-label="Mover para a direita">▶</button>
+            <button class="touch-btn" type="button" data-hold="ArrowDown" aria-label="Defender">DEF</button>
+          </div>
+          <div class="touch-actions">
+            <button class="touch-btn touch-run" type="button" data-hold="ShiftLeft" aria-label="Correr (segure)">CORRER</button>
+            <button class="touch-btn touch-hit" type="button" data-tap="punch" aria-label="Soco">SOCO</button>
+            <button class="touch-btn touch-hit" type="button" data-tap="kick" aria-label="Chute">CHUTE</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lower-grid">
+      <article class="info-card">
+        <p class="eyebrow">02 / COMO JOGAR</p>
+        <h2>A JORNADA</h2>
+        <p>Como no original de 1984, a aventura é contínua: derrote o inimigo, avance para a direita e siga pela fortaleza. Não há vidas extras: ao cair, você recomeça do penhasco.</p>
+        <ul>
+          <li><b>Movimento</b><span>Use ← e → para ajustar a distância. Andando você fica em postura de luta.</span></li>
+          <li><b>Ataque</b><span>Espaço desfere um soco; X aplica um chute mais forte.</span></li>
+          <li><b>Corrida</b><span>Segure Shift e mova-se para correr. Correndo você não ataca, e qualquer golpe recebido é fatal.</span></li>
+          <li><b>Defesa</b><span>Segure ↓ para bloquear os ataques do adversário.</span></li>
+          <li><b>Vida</b><span>A energia se recupera aos poucos se você evitar ser atingido por alguns segundos.</span></li>
+        </ul>
+      </article>
+      <article class="info-card design-card">
+        <p class="eyebrow">03 / O PERCURSO</p>
+        <h2>10 ETAPAS ATÉ MARIKO</h2>
+        <ul>
+          <li><b>1-2 · Penhasco e Pátio</b><span>Monte Fuji original ao fundo, os primeiros guardas e o portão de ferro que cai: só passa quem corre.</span></li>
+          <li><b>3 · A Muralha</b><span>A fortaleza original de 1986 domina o horizonte; outro guarda protege a entrada.</span></li>
+          <li><b>4-5 · Pátio Interno e Palácio</b><span>Colunas e portais reconstruídos dos cenários originais do disco.</span></li>
+          <li><b>6-7 · Escadaria e Salão</b><span>A escada original leva ao salão; guardas de elite atacam sem hesitar.</span></li>
+          <li><b>8 · O Falcão</b><span>A ave de Akuma mergulha do alto. Rebata no tempo exato.</span></li>
+          <li><b>9 · Sala do Trono</b><span>O duelo final contra Akuma.</span></li>
+          <li><b>10 · A Prisão</b><span>Mariko espera. Aproxime-se correndo, sem postura de luta.</span></li>
+        </ul>
+      </article>
+    </section>
+
+    <footer class="site-footer">
+      <div><b>KARATEKA REBORN</b><span>Projeto escolar inspirado no clássico de 1984. Não é um port oficial.</span></div>
+      <div class="credits"><b>CRÉDITOS DO TRIO</b><span>Game Design & Arte · Lógica & Física · Estado & Interface</span></div>
+    </footer>
+  </main>
+  <script src="game.js"></script>
+</body>
+</html>

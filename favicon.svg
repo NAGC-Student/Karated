@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="8" fill="#11100d"/>
+  <rect x="3.5" y="3.5" width="57" height="57" rx="6" fill="none" stroke="#c8a66a" stroke-width="2"/>
+  <text x="32" y="45" font-family="'Noto Sans CJK JP','Hiragino Sans','Yu Gothic',serif" font-size="38" font-weight="700" text-anchor="middle" fill="#c8a66a">拳</text>
+</svg>
